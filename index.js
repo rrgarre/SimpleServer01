@@ -26,10 +26,15 @@ let notes = [
 ]
 
 // MIDDLEWARES
-app.use(express.static('build'))
+// app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
-app.use(morgan('combined'))
+morgan.token('bodyRequest', (request, response)=>{
+  return JSON.stringify(request.body)
+})
+// Y llamamos al middleware Morgan con un mensaje formateado con los tokkens que queremos
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyRequest'))
+// app.use(morgan('combined'))
 
 // Funcion para generar nueva ID
 const getNewId = ()=>{
@@ -39,6 +44,7 @@ const getNewId = ()=>{
   return maxId+1
 }
 
+// GETS
 app.get('/', (request, response)=>{
   response.send(
     '<h1>Hola mundo!!</h1><p>empezamos aquí...</p>'
@@ -85,6 +91,14 @@ app.delete('/api/notes/:id', (request, response)=>{
   // response.json(notes.filter(n=>n.id!==id))
   notes = notes.filter(n=>n.id!==id)
   response.status(204).end()
+})
+
+// PUTS
+app.put('/api/notes/:id', (request, response)=>{
+  const id = Number(request.params.id)
+  const noteChanged = request.body
+  notes = notes.map(n=>n.id!==id? n : noteChanged)
+  response.json(noteChanged)
 })
 
 
