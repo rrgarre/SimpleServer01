@@ -1,0 +1,94 @@
+const { request, response } = require('express')
+const express = require('express')
+const morgan = require('morgan')
+const cors = require('cors')
+const app = express()
+
+app.use(express.json())
+
+let notes = [
+  {
+    id: 1,
+    content: "HTML is easy",
+    date: "2019-05-30T17:30:31.098Z",
+    important: true
+  },
+  {
+    id: 2,
+    content: "Browser can execute only Javascript",
+    date: "2019-05-30T18:39:34.091Z",
+    important: false
+  },
+  {
+    id: 3,
+    content: "GET and POST are the most important methods of HTTP protocol",
+    date: "2019-05-30T19:20:14.298Z",
+    important: true
+  }
+]
+
+// MIDDLEWARES
+app.use(cors())
+app.use(morgan('combined'))
+
+// Funcion para generar nueva ID
+const getNewId = ()=>{
+  const maxId = notes.length > 0
+    ? Math.max(...notes.map(n=>n.id))
+    : 0
+  return maxId+1
+}
+
+app.get('/', (request, response)=>{
+  response.send(
+    '<h1>Hola mundo!!</h1><p>empezamos aquí...</p>'
+    )
+})
+app.get('/api/notes', (request, response)=>{
+  response.json(notes)
+})
+app.get('/api/notes/:id', (request, response)=>{
+  const id = parseInt(request.params.id)
+  const note = notes.find(n => n.id === id)
+  console.table(note)
+  if(note)
+    response.json(note)
+  else
+    response.status(404).end()
+})
+
+// AÑADIR
+app.post('/api/notes/', (request, response)=>{
+  const body = request.body
+  if(!body.content){
+    return response.status(400).json({error: "Falta contenido de la nota"})
+  }
+
+  const note = {
+    id: getNewId(),
+    content: body.content,
+    date: new Date(),
+    important: body.important || false
+  }
+
+  console.log(note)
+  notes = notes.concat(note)
+
+  response.json(note)
+
+})
+
+// BORRADO
+app.delete('/api/notes/:id', (request, response)=>{
+  const id = parseInt(request.params.id)
+  console.log(`Borrar nota con id:${id}`)
+  // response.json(notes.filter(n=>n.id!==id))
+  notes = notes.filter(n=>n.id!==id)
+  response.status(204).end()
+})
+
+
+const PORT = 3001
+app.listen(PORT, ()=>{
+  console.log(`Server running on port:${PORT}`)
+})
