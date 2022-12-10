@@ -1,30 +1,32 @@
 // Rama de DESARROLLO
 
+require('dotenv').config()
 const { request, response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
+const mongoose = require('mongoose')
 
 let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2019-05-30T18:39:34.091Z",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2019-05-30T19:20:14.298Z",
-    important: true
-  }
+  // {
+  //   id: 1,
+  //   content: "HTML is easy",
+  //   date: "2019-05-30T17:30:31.098Z",
+  //   important: true
+  // },
+  // {
+  //   id: 2,
+  //   content: "Browser can execute only Javascript",
+  //   date: "2019-05-30T18:39:34.091Z",
+  //   important: false
+  // },
+  // {
+  //   id: 3,
+  //   content: "GET and POST are the most important methods of HTTP protocol",
+  //   date: "2019-05-30T19:20:14.298Z",
+  //   important: true
+  // }
 ]
 
 // MIDDLEWARES
@@ -46,6 +48,32 @@ const getNewId = ()=>{
   return maxId+1
 }
 
+// BBDD
+// const password = process.argv[2]
+const password = 'usuarioatlas'
+// const url =
+//   `mongodb+srv://usuario:${password}@cluster0.cnu3hij.mongodb.net/note-app?retryWrites=true&w=majority`
+const url = process.env.MONGODB_URI
+mongoose.connect(url)
+
+const noteSchema = mongoose.Schema({
+  content: String,
+  date: Date,
+  important: Boolean,
+})
+// Transformacion del metodo toJSON para quitar los campos _id y __v de los recursos retornados
+// Y añadimos el campo id, que es un toString del _id, i la app de React puede seguir asignando las KEYS como id
+// Esto no afecta al objeto retornado de la BBDD
+// Hace efecto cuando el metodo .json de respopnse, hace uso de .toJSON, el cual está reescrito
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+const Note = mongoose.model('Note', noteSchema)
+
 // GETS
 app.get('/', (request, response)=>{
   response.send(
@@ -53,7 +81,12 @@ app.get('/', (request, response)=>{
     )
 })
 app.get('/api/notes', (request, response)=>{
-  response.json(notes)
+  // response.json(notes)
+  // con BBDD
+  Note.find({}).then(result=>{
+    console.log(result)
+    response.json(result)
+  })
 })
 app.get('/api/notes/:id', (request, response)=>{
   const id = parseInt(request.params.id)
@@ -104,7 +137,8 @@ app.put('/api/notes/:id', (request, response)=>{
 })
 
 
-const PORT = 3001
+// const PORT = 3001
+const PORT = process.env.PORT
 app.listen(PORT, ()=>{
   console.log(`Server running on port:${PORT}`)
 })

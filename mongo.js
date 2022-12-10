@@ -21,19 +21,19 @@ const noteSchema = new mongoose.Schema({
 const Note = mongoose.model('Note', noteSchema)
 
 const note = new Note({
-  content: 'Nueva nota de Sábado',
+  content: 'GET and POST are the most important methods of HTTP protocol',
   date: new Date(),
   important: true,
 })
 
-note.save().then(result => {
-  console.log(result)
-  console.log('note saved!')
-  mongoose.connection.close()
-})
-
-
-// Note.find({important: false}).then(result => {
-//   result.forEach(note => console.log(note))
+// note.save().then(result => {
+//   console.log(result)
+//   console.log('note saved!')
 //   mongoose.connection.close()
 // })
+
+
+Note.find({important: false}).then(result => {
+  result.forEach(note => console.log(note))
+  mongoose.connection.close()
+})
