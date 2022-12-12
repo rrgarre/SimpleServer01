@@ -1,12 +1,12 @@
 // Rama de DESARROLLO
 
 require('dotenv').config()
-const { request, response } = require('express')
+// const { request, response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
-// const mongoose = require('mongoose')
+const mongoose = require('mongoose')
 // Importamos el Modelo
 const Note = require('./models/note')
 
@@ -45,13 +45,15 @@ app.get('/api/notes', (request, response)=>{
 })
 
 app.get('/api/notes/:id', (request, response)=>{
-  const id = parseInt(request.params.id)
-  const note = notes.find(n => n.id === id)
-  console.table(note)
-  if(note)
-    response.json(note)
-  else
-    response.status(404).end()
+  const id = request.params.id
+  const note = Note.findById(id)
+    .then(result=>{
+      response.json(result)
+    })
+    .catch(error=>{
+      console.log('No se encuentra la nota', error.message)
+      response.status(404).end()
+    })
 })
 
 // AÑADIR
@@ -61,16 +63,17 @@ app.post('/api/notes/', (request, response)=>{
     return response.status(400).json({error: "Falta contenido de la nota"})
   }
 
-  const note = {
-    id: getNewId(),
+  // Nueva nota con el MODELO Note
+  const note = new Note({
     content: body.content,
     date: new Date(),
-    important: body.important || false
-  }
-  console.log(note)
-  notes = notes.concat(note)
+    important: body.important || false,
+  })
 
-  response.json(note)
+  note.save()
+    .then(result=>{
+      response.json(result)
+    })
 })
 
 // BORRADO
