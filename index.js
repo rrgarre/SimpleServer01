@@ -46,7 +46,7 @@ app.get('/api/notes', (request, response)=>{
 
 app.get('/api/notes/:id', (request, response)=>{
   const id = request.params.id
-  const note = Note.findById(id)
+  Note.findById(id)
     .then(result=>{
       response.json(result)
     })
@@ -78,19 +78,21 @@ app.post('/api/notes/', (request, response)=>{
 
 // BORRADO
 app.delete('/api/notes/:id', (request, response)=>{
-  const id = parseInt(request.params.id)
-  console.log(`Borrar nota con id:${id}`)
-  // response.json(notes.filter(n=>n.id!==id))
-  notes = notes.filter(n=>n.id!==id)
-  response.status(204).end()
+  const id = request.params.id
+  Note.findByIdAndDelete(id)
+    .then(result=>{
+      response.status(204).end()
+    })
 })
 
 // PUTS
 app.put('/api/notes/:id', (request, response)=>{
-  const id = Number(request.params.id)
+  const id = request.params.id
   const noteChanged = request.body
-  notes = notes.map(n=>n.id!==id? n : noteChanged)
-  response.json(noteChanged)
+  Note.findByIdAndUpdate(id, noteChanged)
+    .then(result=>{
+      response.json(noteChanged)
+    })
 })
 
 
