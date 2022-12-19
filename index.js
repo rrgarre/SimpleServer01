@@ -33,7 +33,8 @@ const getNewId = ()=>{
 // GETS
 app.get('/', (request, response)=>{
   response.send(
-    '<h1>API para la app de notas</h1><p>empezamos aquí...</p>'
+    // '<h1>API para la app de notas</h1><p><a href="api.garredev.online:3001/api/notes">/api/notes</a></p>'
+    `<h1>API para la app de notas</h1><p><a href="/api/notes">/api/notes</a></p>`
     )
 })
 
