@@ -63,11 +63,11 @@ app.get('/api/notes/:id', (request, response, next)=>{
 })
 
 // AÑADIR
-app.post('/api/notes/', (request, response)=>{
+app.post('/api/notes/', (request, response, next)=>{
   const body = request.body
-  if(!body.content){
-    return response.status(400).json({error: "Falta contenido de la nota"})
-  }
+  // if(!body.content){
+  //   return response.status(400).json({error: "Falta contenido de la nota"})
+  // }
 
   // Nueva nota con el MODELO Note
   const note = new Note({
@@ -80,6 +80,7 @@ app.post('/api/notes/', (request, response)=>{
     .then(result=>{
       response.json(result)
     })
+    .catch(error=>next(error))
 })
 
 // BORRADO
@@ -117,10 +118,13 @@ const unknowEndpoint = (request, response) => {
 }
 // Manejador de Errores MIDDLEWARE definición
 const errorHandler = (error, request, response, next) => {
-  console.log('XXXXX manejador de Errores XXXX')
-  console.log(error.message)
+  console.log('XXX mensaje: ', error.message)
+  console.log('XXX nombre: ', error.name)
   if(error.name === 'CastError'){
     return response.status(400).json({error: "malformatted id"})
+  }
+  if(error.name === 'ValidationError'){
+    return response.status(400).json({error: error.message})
   }
   console.log('XXXXX Pasamos el Error a los manejadores de Express XXXX')
   next(error)
