@@ -5,11 +5,16 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const app = express()
 const mongoose = require('mongoose')
+// Importamos los Middlewares
+const cleanerConsole = require('./middlewares/cleanerConsole')
+const unknowEndpoint = require('./middlewares/unknowEndpoint')
+const errorHandler = require('./middlewares/errorHandler')
 // Importamos el Modelo
 const Note = require('./models/note')
 
+// Arranca servidor
+const app = express()
 
 // MIDDLEWARES
 // app.use(express.static('build'))
@@ -21,13 +26,8 @@ morgan.token('bodyRequest', (request, response)=>{
 // Y llamamos al middleware Morgan con un mensaje formateado con los tokkens que queremos
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyRequest'))
 
-// Funcion para generar nueva ID
-// const getNewId = ()=>{
-//   const maxId = notes.length > 0
-//     ? Math.max(...notes.map(n=>n.id))
-//     : 0
-//   return maxId+1
-// }
+
+app.use(cleanerConsole)
 
 // GETS
 app.get('/', (request, response)=>{
@@ -51,23 +51,15 @@ app.get('/api/notes/:id', (request, response, next)=>{
       if(result){
         response.json(result)
       }else{
-        response.status(404).end()
+        response.status(404).send({error: "No existe la nota"})
       }
     })
-    // .catch(error=>{
-    //   console.log(error)
-    //   // response.status(500).end()
-    //   response.status(400).json({error: "malformatted ID"})
-    // })
     .catch(error=>next(error))
 })
 
 // AÑADIR
 app.post('/api/notes/', (request, response, next)=>{
   const body = request.body
-  // if(!body.content){
-  //   return response.status(400).json({error: "Falta contenido de la nota"})
-  // }
 
   // Nueva nota con el MODELO Note
   const note = new Note({
@@ -112,23 +104,6 @@ app.listen(PORT, ()=>{
 
 
 // MIDDLEWARES
-// unknown Endpoint
-const unknowEndpoint = (request, response) => {
-  response.status(404).send({error: "unknow endpoint"})
-}
-// Manejador de Errores MIDDLEWARE definición
-const errorHandler = (error, request, response, next) => {
-  console.log('XXX mensaje: ', error.message)
-  console.log('XXX nombre: ', error.name)
-  if(error.name === 'CastError'){
-    return response.status(400).json({error: "malformatted id"})
-  }
-  if(error.name === 'ValidationError'){
-    return response.status(400).json({error: error.message})
-  }
-  console.log('XXXXX Pasamos el Error a los manejadores de Express XXXX')
-  next(error)
-}
 
 app.use(unknowEndpoint)
 app.use(errorHandler)
