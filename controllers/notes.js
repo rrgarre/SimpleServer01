@@ -3,11 +3,15 @@ const Note = require('../models/note')
 
 
 // GETS
-notesRouter.get('/', (request, response)=>{
-  Note.find({}).then(result=>{
-    // console.log(result)
-    response.json(result)
-  })
+// notesRouter.get('/', (request, response)=>{
+//   Note.find({}).then(result=>{
+//     // console.log(result)
+//     response.json(result)
+//   })
+// })
+notesRouter.get('/', async (request, response)=>{
+  let result = await Note.find({})
+  return response.json(result)
 })
 
 notesRouter.get('/:id', (request, response, next)=>{
