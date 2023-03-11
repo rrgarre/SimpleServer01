@@ -1,10 +1,12 @@
 // Rama de DESARROLLO
 
 const config = require('./utils/config')
+const cleannerCollections = require('./utils/cleannerCollections')
 const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 const notesRouter = require('./controllers/notes')
+const usersRouter = require('./controllers/users')
 
 const logger = require('./utils/logger')
 const morgan = require('morgan')
@@ -26,6 +28,8 @@ mongoose.connect(config.MONGODB_URI)
     console.log('No se ha podido conectar con la base de datos', error.message)
   })
 
+// Limpiamos Colecciones ???
+cleannerCollections.users()
 
 
 // MIDDLEWARES
@@ -40,6 +44,7 @@ morgan.token('bodyRequest', (request, response)=>{
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyRequest'))
 
 app.use('/api/notes', notesRouter)
+app.use('/api/users', usersRouter)
 
 app.use(unknowEndpoint)
 app.use(errorHandler)
