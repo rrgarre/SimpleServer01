@@ -1,10 +1,15 @@
 // Rama de DESARROLLO
 
 const config = require('./utils/config')
-const cleannerCollections = require('./utils/cleannerCollections')
+const initializarCollections = require('./utils/initializarCollections')
+
+// NUCLEO DE APP //////////////////////////////////
 const express = require('express')
 const app = express()
+///////////////////////////////////////////////////
+
 const mongoose = require('mongoose')
+// Importamos los controladores
 const notesRouter = require('./controllers/notes')
 const usersRouter = require('./controllers/users')
 
@@ -17,9 +22,9 @@ const cleanerConsole = require('./middlewares/cleanerConsole')
 const unknowEndpoint = require('./middlewares/unknowEndpoint')
 const errorHandler = require('./middlewares/errorHandler')
 
+
 // Conectamos la base de datos
 logger.info(`connecting to ${config.MONGODB_URI}`)
-
 mongoose.connect(config.MONGODB_URI)
   .then(result=>{
     console.log('Conexión establecida')
@@ -28,8 +33,12 @@ mongoose.connect(config.MONGODB_URI)
     console.log('No se ha podido conectar con la base de datos', error.message)
   })
 
-// Limpiamos Colecciones ???
-cleannerCollections.users()
+
+  // Limpiamos Colecciones ???
+initializarCollections.notes()
+initializarCollections.users()
+
+
 
 
 // MIDDLEWARES
@@ -43,10 +52,13 @@ morgan.token('bodyRequest', (request, response)=>{
 // Y llamamos al middleware Morgan con un mensaje formateado con los tokkens que queremos
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyRequest'))
 
+// Enrutadores
 app.use('/api/notes', notesRouter)
 app.use('/api/users', usersRouter)
 
+// Control de errores
 app.use(unknowEndpoint)
 app.use(errorHandler)
+
 
 module.exports = app
