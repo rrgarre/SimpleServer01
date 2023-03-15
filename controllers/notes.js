@@ -12,13 +12,13 @@ const usersRouter = require('./users')
 //   })
 // })
 notesRouter.get('/', async (request, response)=>{
-  let result = await Note.find({})
+  let result = await Note.find({}).populate('user', {username: 1, name: 1})
   return response.json(result)
 })
 
 notesRouter.get('/:id', (request, response, next)=>{
   const id = request.params.id
-  Note.findById(id)
+  Note.findById(id).populate('user', {username: 1, name: 1})
     .then(result=>{
       if(result){
         response.json(result)
