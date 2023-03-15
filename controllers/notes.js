@@ -1,5 +1,7 @@
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
+const User =require('../models/user')
+const usersRouter = require('./users')
 
 
 // GETS
@@ -28,20 +30,28 @@ notesRouter.get('/:id', (request, response, next)=>{
 })
 
 // AÑADIR
-notesRouter.post('/', (request, response, next)=>{
+notesRouter.post('/', async (request, response, next)=>{
   const body = request.body
+  const user = await User.findById(body.userId)
+
   // Nueva nota con el MODELO Note
   const note = new Note({
     content: body.content,
     date: new Date(),
     important: body.important || false,
+    user: user._id
   })
 
-  note.save()
-    .then(result=>{
-      response.json(result)
-    })
-    .catch(error=>next(error))
+  // note.save()
+  //   .then(result=>{
+  //     response.json(result)
+  //   })
+  //   .catch(error=>next(error))
+  const savedNote = await note.save()
+  user.notes = user.notes.concat(savedNote)
+  await user.save() 
+
+  response.json(savedNote)
 })
 
 // BORRADO

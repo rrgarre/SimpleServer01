@@ -8,6 +8,11 @@ usersRouter.get('/', async (request, response)=>{
     let result = await User.find({})
     return response.json(result)
 })
+usersRouter.get('/:id', async (request, response) => {
+    const id = request.params.id
+    const user = await User.findById(id).populate('notes')
+    response.json(user)
+})
 
 usersRouter.post('/', async (request, response, next)=>{
     const body = request.body

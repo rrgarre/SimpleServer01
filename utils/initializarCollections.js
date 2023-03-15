@@ -6,15 +6,16 @@ const mongoose = require('mongoose')
 
 const initialNotes = [
     {
-      content: 'Primera nota',
-      date: new Date(),
-      important: false,
+        content: 'Primera nota',
+        date: new Date(),
+        important: false,
+        user: '6411ae276ffc36c1b80ce0f4'
     },
     {
-      content: 'Contenido de la segunda nota',
-      date: new Date(),
-      important: true,
-
+        content: 'Contenido de la segunda nota',
+        date: new Date(),
+        important: true,
+        user: '6411ae276ffc36c1b80ce0f4'
     }
 ]
 const initialUsers = [

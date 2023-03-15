@@ -34,10 +34,9 @@ mongoose.connect(config.MONGODB_URI)
   })
 
 
-  // Limpiamos Colecciones ???
-initializarCollections.notes()
-initializarCollections.users()
-
+// Limpiamos Colecciones ???
+// initializarCollections.notes()
+// initializarCollections.users()
 
 
 
