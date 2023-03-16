@@ -10,6 +10,7 @@ const app = express()
 
 const mongoose = require('mongoose')
 // Importamos los controladores
+const loginRouter = require('./controllers/login')
 const notesRouter = require('./controllers/notes')
 const usersRouter = require('./controllers/users')
 
@@ -52,6 +53,7 @@ morgan.token('bodyRequest', (request, response)=>{
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyRequest'))
 
 // Enrutadores
+app.use('/api/login', loginRouter)
 app.use('/api/notes', notesRouter)
 app.use('/api/users', usersRouter)
 

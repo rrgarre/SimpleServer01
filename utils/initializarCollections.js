@@ -22,12 +22,12 @@ const initialUsers = [
     {
         username: 'RRGarre',
         name: 'Rafa',
-        passwordHash: 'asdasdasdasdasdasd'
+        passwordHash: '123123rrgarre'
     },
     {
         username: 'EliteDanza',
         name: 'Tami',
-        passwordHash: 'asdasdasdasdasdasd'
+        passwordHash: '123123elitedanza'
     }
 ]
 
