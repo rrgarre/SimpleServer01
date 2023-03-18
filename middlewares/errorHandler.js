@@ -11,6 +11,9 @@ module.exports = (error, request, response, next) => {
       errorMessage: error.message
     })
   }
+  if(error.name === 'JsonWebTokenError'){
+    return response.status(400).json({error: 'TOKEN missing or invalid'})
+  }
   console.log('XXXXX Pasamos el Error a los manejadores de Express XXXX')
   next(error)
 }
