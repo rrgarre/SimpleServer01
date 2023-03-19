@@ -58,12 +58,15 @@ notesRouter.post('/', async (request, response, next)=>{
   }
   // const decodedToken = jwt.verify(token, util.SECRET_FOR_JWT)
 
-  console.log(decodedToken)
-  if(!token || !decodedToken.id){
-    return response.status(401).json({error: 'token missing or invalid'})
-  }
+  // console.log(decodedToken)
+  // if(!token || !decodedToken.id){
+  //   return response.status(401).json({error: 'token missing or invalid'})
+  // }
   
   const user = await User.findById(decodedToken.id)
+
+  if(!token || !decodedToken.id || !user)
+    return response.status(401).json({error: 'token missing or invalid'})
 
   // Nueva nota con el MODELO Note
   const note = new Note({

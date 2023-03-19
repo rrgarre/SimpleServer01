@@ -12,7 +12,10 @@ module.exports = (error, request, response, next) => {
     })
   }
   if(error.name === 'JsonWebTokenError'){
-    return response.status(400).json({error: 'TOKEN missing or invalid'})
+    return response.status(401).json({error: 'TOKEN missing or invalid'})
+  }
+  if(error.name === 'TokenExpiredError'){
+    return response.status(401).json({error: 'Token expired. Log again!'})
   }
   console.log('XXXXX Pasamos el Error a los manejadores de Express XXXX')
   next(error)
