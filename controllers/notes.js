@@ -33,9 +33,6 @@ notesRouter.get('/:id', (request, response, next)=>{
 
 // FUNCION PARA RECUPERAR EL TOKEN DE LA REQUEST
 const getTokenFrom = (request) => {
-  // const tempRequestAuth = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJyZ2FycmUiLCJpZCI6IjY0MTJmNjc0Nzc4YmMxYmU4NTE5MjFkNSIsImlhdCI6MTY3OTE1ODU3MX0._eL5KkTIvkSKtlW_RQq2N6SOFpp2q9xCQKXhKaQ9ylk'
-  // const authorization = tempRequestAuth
-  console.log(request.get('authorization'))
   const authorization = request.get('authorization')
   
   if(authorization && authorization.toLowerCase().startsWith('bearer ')){
@@ -52,16 +49,12 @@ notesRouter.post('/', async (request, response, next)=>{
   let decodedToken
   try {
     decodedToken = jwt.verify(token, util.SECRET_FOR_JWT)
+    console.log(decodedToken)
+    
   } catch (error) {
     next(error)
     return
   }
-  // const decodedToken = jwt.verify(token, util.SECRET_FOR_JWT)
-
-  // console.log(decodedToken)
-  // if(!token || !decodedToken.id){
-  //   return response.status(401).json({error: 'token missing or invalid'})
-  // }
   
   const user = await User.findById(decodedToken.id)
 
@@ -94,14 +87,32 @@ notesRouter.delete('/:id', (request, response, next)=>{
 })
 
 // PUTS
-notesRouter.put('/:id', (request, response, next)=>{
+notesRouter.put('/:id', async (request, response, next)=>{
   const id = request.params.id
   const noteChanged = request.body
-  Note.findByIdAndUpdate(id, noteChanged, {new: true})
-    .then(result=>{
-      response.json(result)
-    })
-    .catch(error=>next(error))
+  
+  console.log('XXXXXXXX NOTA MODIFICADA', noteChanged)
+  const notaPescada = await Note.findById(id)
+    .populate('user', {username: 1, name: 1})
+    
+  console.log('XXXXXXX NOTA PESCADA', notaPescada)
+  const newNoteChanged = {...notaPescada._doc, important: !notaPescada.important}
+  console.log('XXXXXXX NEW NOTA PESCADA', newNoteChanged)
+
+  try {
+    const result = await Note.findByIdAndUpdate(id, newNoteChanged, {new: true})
+    console.log('XXXXXXX NOTA ALMACENADA EN DDBB', result)
+    return response.json(result)
+  } catch (error) {
+    next(error)
+  }
+
+  // Note.findByIdAndUpdate(id, noteChanged, {new: true})
+  //   .then(result=>{
+  //     console.log('XXXXXXXXXXXXXXXXXXXXX')
+  //     response.json(result)
+  //   })
+  //   .catch(error=>next(error))
 })
 
 
