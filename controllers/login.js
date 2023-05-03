@@ -8,6 +8,20 @@ loginRouter.get('/', (request, response) => {
   response.send('Desde controlador de Login')
 })
 
+loginRouter.get('/:token', (request, response) => {
+  const token = request.params.token
+  // return response.status(201).end()
+  try {
+    const validToken = jwt.verify(token, SECRET_FOR_JWT)
+    return response.status(202).send('Correcto')
+  } catch (error) {
+    return response.status(401).send('Caducado')
+  }
+  // validToken
+  //   ? response.status(200).end()
+  //   : response.status(402).end()
+})
+
 loginRouter.post('/', async (request, response) => {
   const body = request.body
 

@@ -53,7 +53,8 @@ notesRouter.post('/', async (request, response, next)=>{
     
   } catch (error) {
     next(error)
-    return
+    // return response.status(401).json({error:'Error de token'})
+    return response.status(402)
   }
   
   const user = await User.findById(decodedToken.id)
@@ -69,11 +70,17 @@ notesRouter.post('/', async (request, response, next)=>{
     user: user._id
   })
 
-  const savedNote = await note.save()
-  user.notes = user.notes.concat(savedNote)
-  await user.save() 
+  try {
+    const savedNote = await note.save()
+    user.notes = user.notes.concat(savedNote)
+    await user.save() 
+    response.json(savedNote)
+  } catch (error) {
+    console.log('ERROR')
+    // next(error)
+    return response.status(401).json({error:'Error al añadir la nota'})
+  }
 
-  response.json(savedNote)
 })
 
 // BORRADO
